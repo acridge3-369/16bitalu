@@ -1,0 +1,52 @@
+module tb_ALU();
+    reg [15:0] instruction;
+    wire [15:0] result;
+
+    // Initialize the ALU
+    ALU uut (
+        .instruction(instruction),
+        .result(result)
+    );
+
+    initial begin
+        // Initialize registers in the ALU with new values
+        uut.registers[0] = 16'h0010; // R0 = 16
+        uut.registers[1] = 16'h0020; // R1 = 32
+        uut.registers[2] = 16'h0004; // R2 = 4
+        uut.registers[3] = 16'h0008; // R3 = 8
+
+        // Test ADD R1, R2 -> R3
+        instruction = 16'b0000_0001_0010_0011; // R3 = R1 + R2 (32 + 4)
+        #10 $display("ADD Result: R3 = %h", uut.registers[3]);
+
+        // Test SUB R0, R3 -> R2
+        instruction = 16'b0001_0000_0011_0010; // R2 = R0 - R3 (16 - 8)
+        #10 $display("SUB Result: R2 = %h", uut.registers[2]);
+
+        // Test MUL R1, R0 -> R3
+        instruction = 16'b0010_0001_0000_0011; // R3 = R1 * R0 (32 * 16)
+        #10 $display("MUL Result: R3 = %h", uut.registers[3]);
+
+        // Test AND R1, R2 -> R3
+        instruction = 16'b0011_0001_0010_0011; // R3 = R1 & R2 (32 & 4)
+        #10 $display("AND Result: R3 = %h", uut.registers[3]);
+
+        // Test OR R0, R3 -> R1
+        instruction = 16'b0100_0000_0011_0001; // R1 = R0 | R3 (16 | current R3)
+        #10 $display("OR Result: R1 = %h", uut.registers[1]);
+
+        // Test EXOR R1, R2 -> R3
+        instruction = 16'b0101_0001_0010_0011; // R3 = R1 ^ R2 (current R1 ^ 4)
+        #10 $display("EXOR Result: R3 = %h", uut.registers[3]);
+
+        // Test NOT R1 -> R2
+        instruction = 16'b0110_0001_0000_0010; // R2 = ~R1 (NOT current R1)
+        #10 $display("NOT Result: R2 = %h", uut.registers[2]);
+
+        // Test Load Immediate 0x7F to R1
+        instruction = 16'b1111_0001_01111111; // R1 = 0x7F
+        #10 $display("Load Immediate Result: R1 = %h", uut.registers[1]);
+
+        $finish;
+    end
+endmodule
