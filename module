@@ -1,0 +1,31 @@
+module ALU(
+    input  [15:0] instruction, // 16 bit instruction input
+    output reg [15:0] result // 16 bit wide register
+);
+    // Register array
+    reg [15:0] registers [15:0];
+    
+    // Extract instruction fields
+    wire [3:0] opcode = instruction[15:12];
+    wire [3:0] reg1   = instruction[11:8];
+    wire [3:0] reg2   = instruction[7:4];
+    wire [3:0] dest   = instruction[3:0];
+    wire [7:0] immediate = instruction[7:0];
+    
+    always @(opcode, reg1, reg2, dest, registers[reg1], registers[reg2]) begin
+        case (opcode)
+            4'b0000: result = registers[reg1] + registers[reg2]; // ADD
+            4'b0001: result = registers[reg1] - registers[reg2]; // SUB
+            4'b0010: result = registers[reg1] * registers[reg2]; // MUL
+            4'b0011: result = registers[reg1] & registers[reg2]; // AND
+            4'b0100: result = registers[reg1] | registers[reg2]; // OR
+            4'b0101: result = registers[reg1] ^ registers[reg2]; // EXOR
+            4'b0110: result = ~registers[reg1];                  // NOT
+            4'b1111: result = {instruction[7:0], 8'b0};          // Load Immediate
+            default: result = 16'b0;                             // Default
+        endcase
+        
+        // Store result in destination register
+        registers[dest] = result;
+    end
+endmodule
